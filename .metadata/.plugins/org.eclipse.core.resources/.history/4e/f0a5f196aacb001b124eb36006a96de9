@@ -1,0 +1,7 @@
+package com.aws.proj1.service;
+
+public interface Ec2Service {
+	
+	public void endInstance();
+
+}

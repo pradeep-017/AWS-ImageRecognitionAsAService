@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<form th:action="@{/results}" th:object="${images}" method="post"
+	enctype="multipart/form-data">
+	<label>Uploaded Images Result Page</label>
+	<br/><br/>
+	<input id="submit" type="submit" tabindex="5" value="Get Results">
+</form>
+</html>

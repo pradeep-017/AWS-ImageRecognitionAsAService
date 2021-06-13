@@ -1,0 +1,22 @@
+1623521710573	Rename package 'com.aws.proj1'
+1623521729919	Rename package 'com.aws.proj1.config'
+1623521757076	Rename package 'com.aws.proj1.constants'
+1623521775244	Rename package 'com.aws.proj1.repo'
+1623521803815	Rename package 'com.aws.proj1.repo.impl'
+1623521858742	Move compilation units
+1623521866791	Delete element
+1623521873299	Delete element
+1623521889979	Move compilation units
+1623521895930	Delete element
+1623521910259	Rename package 'com.aws.proj1.service'
+1623522102280	Rename type 'AWSConstants'
+1623522204028	Rename field 'INPUT_QUEUE_NAME'
+1623522224461	Rename field 'OUTPUT_QUEUE'
+1623537517092	Rename package 'com.aws.proj1'
+1623537530732	Rename type 'ListenerApplicationTests'
+1623537868100	Delete element
+1623538009003	Delete element
+1623538120464	Delete elements
+1623540366714	Delete elements
+1623540374198	Delete element
+1623540380021	Delete element

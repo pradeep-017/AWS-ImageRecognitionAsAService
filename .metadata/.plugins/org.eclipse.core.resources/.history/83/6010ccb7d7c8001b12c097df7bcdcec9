@@ -1,0 +1,34 @@
+package com.example.demo2.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
+@Controller
+public class Demo2Controller {
+	@GetMapping("/")
+    String index(){
+        return "index";
+    }
+	
+	@PostMapping("/imageRecog")
+	String imageRecog() {
+		return "imageRecog";
+	}
+	
+//	@PostMapping("/users/save")
+//    public RedirectView saveUser(User user,
+//            @RequestParam("image") MultipartFile multipartFile) throws IOException {
+//         
+//        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+//        user.setPhotos(fileName);
+//         
+//        User savedUser = repo.save(user);
+// 
+//        String uploadDir = "user-photos/" + savedUser.getId();
+// 
+//        FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+//         
+//        return new RedirectView("/users", true);
+//    }
+}

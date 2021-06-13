@@ -1,0 +1,7 @@
+-------------------------------------------------------------------------------
+Test set: com.aws.proj1.ListenerApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.355 s <<< FAILURE! - in com.aws.proj1.ListenerApplicationTests
+com.aws.proj1.ListenerApplicationTests  Time elapsed: 0.353 s  <<< ERROR!
+java.lang.IllegalStateException: Unable to find a @SpringBootConfiguration, you need to use @ContextConfiguration or @SpringBootTest(classes=...) with your test
+

@@ -1,0 +1,41 @@
+package com.aws.ccproject.config;
+
+import com.aws.proj1.constants.AwsSecretKeys;
+
+import org.springframework.context.annotation.Configuration;
+
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+
+@Configuration
+public class AwsConfiguration {
+
+	public BasicAWSCredentials basicAWSCredentials() {
+		return new BasicAWSCredentials(AwsSecretKeys.ACCESS_KEY, AwsSecretKeys.SECRET_KEY);
+	}
+
+	public AmazonSQS amazonSQS() {
+		AmazonSQS amazonSQSClient = AmazonSQSClientBuilder.standard().withRegion(AwsSecretKeys.REGION)
+				.withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials())).build();
+		return amazonSQSClient;
+	}
+
+	public AmazonEC2 amazonEC2() {
+		AmazonEC2 amazonEC2 = AmazonEC2ClientBuilder.standard().withRegion(AwsSecretKeys.REGION)
+				.withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials())).build();
+		return amazonEC2;
+	}
+	
+	public AmazonS3 amazonS3() {
+		AmazonS3 amazonS3 = AmazonS3ClientBuilder.standard().withRegion(AwsSecretKeys.REGION)
+				.withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials())).build();
+		return amazonS3;
+	}
+
+}

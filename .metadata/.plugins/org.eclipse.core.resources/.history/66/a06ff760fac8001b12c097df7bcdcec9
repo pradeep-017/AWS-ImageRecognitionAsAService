@@ -1,0 +1,62 @@
+package com.aws.proj1.service.impl;
+
+import com.aws.proj1.constants.AWSConstants;
+
+import com.aws.proj1.service.Ec2Service;
+import com.aws.proj1.service.ListenerAndDispatchingService;
+import com.aws.proj1.service.S3Service;
+import com.aws.proj1.service.SqsService;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.amazonaws.services.sqs.model.Message;
+
+@Service
+@Slf4j
+public class ListenerAndDispatchingServiceImpl implements ListenerAndDispatchingService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ListenerAndDispatchingServiceImpl.class);
+
+	private static final String LISTENER_AND_DISPATCH_MAIN_ROUTINE ="Listener and dispatch main routine.";
+	private static final String MESSAGE_IMAGE_NAME ="message: {} , imageName: {}";
+	private static final String PREDICT_VALUE ="predictValue: {}";
+	private static final String NO_PREDICTION ="NoPrediction";
+	private static final String PREDICT_VALUE_AFTER_TRIM ="predictValue after trim: {}";
+
+
+	@Autowired
+	private SqsService sqsService;
+
+	@Autowired
+	private S3Service s3Service;
+	
+	@Autowired
+	private Ec2Service ec2Service;
+
+	@Override
+	public void generalFunction() {
+//		log.info(LISTENER_AND_DISPATCH_MAIN_ROUTINE);
+		while (true) {
+			
+			Message message = sqsService.receiveMessage(AWSConstants.INPUT_QUEUE_NAME, 0, 15);
+			if(message == null) {break;}
+			String imageName = message.getBody();
+//			log.info(MESSAGE_IMAGE_NAME, message,imageName);
+			String predictValue = sqsService.deepLearningOutput(imageName);
+//			log.info(PREDICT_VALUE,predictValue);
+			if(predictValue == null) {
+				predictValue = NO_PREDICTION;
+			}
+			predictValue = predictValue.trim();
+//			log.info(PREDICT_VALUE_AFTER_TRIM, predictValue);
+			s3Service.putObject(imageName.substring(0,imageName.length()-4), predictValue);
+			sqsService.sendMessage(imageName + ":" + predictValue, AWSConstants.OUTPUT_QUEUE, 0);
+			sqsService.deleteMessage(message, AWSConstants.INPUT_QUEUE_NAME);
+		}
+//		ec2Service.endInstance();
+	}
+
+}

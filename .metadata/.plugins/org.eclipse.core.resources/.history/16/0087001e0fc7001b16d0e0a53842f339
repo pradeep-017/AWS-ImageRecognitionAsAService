@@ -1,0 +1,48 @@
+package com.example.demo2.config;
+
+import org.springframework.context.annotation.Bean;
+
+import com.example.demo.repo.Ec2Repo;
+import com.example.demo.repo.Ec2RepoImpl;
+import com.example.demo.repo.SqsRepo;
+import com.example.demo.repo.SqsRepoImpl;
+import com.example.demo.service.Ec2Service;
+import com.example.demo.service.Ec2ServiceImpl;
+import com.example.demo.service.LoadBalancerService;
+import com.example.demo.service.LoadBalancerServiceImpl;
+import com.example.demo.service.SqsService;
+import com.example.demo.service.SqsServiceImpl;
+
+public class AppConfig {
+	
+	@Bean
+	public SqsService sqsService() {
+		return new SqsServiceImpl();
+	}
+
+	@Bean
+	public SqsRepo sqsRepo() {
+		return new SqsRepoImpl();
+	}
+	
+	@Bean
+	public Ec2Repo ec2Repo() {
+		return new Ec2RepoImpl();
+	}
+
+	@Bean
+	public Ec2Service ec2Service() {
+		return new Ec2ServiceImpl();
+	}
+	
+	@Bean
+	public AwsConfiguration awsConfiguration() {
+		return new AwsConfiguration();
+	}
+	
+	@Bean
+	public LoadBalancerService loadBalancerService() {
+		return new LoadBalancerServiceImpl();
+	}
+
+}

@@ -1,0 +1,7 @@
+package com.aws.proj1.service;
+
+public interface LoadBalService {
+	
+	public void scaleOut();
+
+}

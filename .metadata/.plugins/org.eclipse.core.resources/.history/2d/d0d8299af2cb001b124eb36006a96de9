@@ -1,0 +1,22 @@
+package com.aws.ccproject;
+
+import com.aws.ccproject.config.AppConfig;
+import com.aws.proj1.service.LoadBalService;
+import com.aws.proj1.service.LoadBalanceService;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+@SpringBootApplication
+public class WebTierApplication {
+	// Main Class
+	public static void main(String[] args) {
+		SpringApplication.run(WebTierApplication.class, args);
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+		LoadBalanceService loadBalancingService = context.getBean(LoadBalService.class);
+		loadBalancingService.scaleOut();
+		context.close();
+	}
+
+}

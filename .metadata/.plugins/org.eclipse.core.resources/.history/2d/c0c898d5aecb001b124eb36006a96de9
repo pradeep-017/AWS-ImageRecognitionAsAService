@@ -1,0 +1,58 @@
+package com.aws.ccproject.service;
+
+import com.aws.ccproject.constants.Constants;
+
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.amazonaws.services.sqs.model.Message;
+
+@Service
+@Slf4j
+public class ListenerAndDispatchingServiceImpl implements ListenerAndDispatchingService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ListenerAndDispatchingServiceImpl.class);
+
+	private static final String LISTENER_AND_DISPATCH_MAIN_ROUTINE ="Listener and dispatch main routine.";
+	private static final String MESSAGE_IMAGE_NAME ="message: {} , imageName: {}";
+	private static final String PREDICT_VALUE ="predictValue: {}";
+	private static final String NO_PREDICTION ="NoPrediction";
+	private static final String PREDICT_VALUE_AFTER_TRIM ="predictValue after trim: {}";
+
+
+	@Autowired
+	private SqsService sqsService;
+
+	@Autowired
+	private S3Service s3Service;
+	
+	@Autowired
+	private Ec2Service ec2Service;
+
+	@Override
+	public void generalFunction() {
+//		log.info(LISTENER_AND_DISPATCH_MAIN_ROUTINE);
+		while (true) {
+			Message message = sqsService.receiveMessage(Constants.INPUT_SQS, 0, 30);
+			if(message == null) 
+				break;
+			String imageName = message.getBody();
+//			log.info(MESSAGE_IMAGE_NAME, message,imageName);
+			String predictedValue = sqsService.deepLearningOutput(imageName);
+//			log.info(PREDICT_VALUE,predictValue);
+			if(predictedValue == null) {
+				predictedValue = NO_PREDICTION;
+			}
+			predictedValue = predictedValue.trim();
+//			log.info(PREDICT_VALUE_AFTER_TRIM, predictValue);
+			s3Service.putObject(imageName.substring(0,imageName.length()-4), predictedValue);
+			sqsService.sendMessage(imageName + ":" + predictedValue, Constants.OUTPUT_SQS, 0);
+			sqsService.deleteMessage(message, Constants.INPUT_SQS);
+		}
+		ec2Service.endInstance();
+	}
+
+}

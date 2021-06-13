@@ -1,0 +1,63 @@
+package com.aws.ccproject.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.aws.ccproject.constants.ApiKeys;
+import com.aws.ccproject.exception.ImagesUploadException;
+import com.aws.proj1.service.ImageService;
+import com.aws.proj1.service.S3Service;
+
+@Controller
+//@RequestMapping("/")
+public class WebTierController {
+
+  @Autowired
+  private ImageService imageURLService;
+
+  @Autowired
+  private S3Service s3Service;
+
+  //post method to read images
+  @PostMapping(value = ApiKeys.INPUT)
+  public String uploadFiles(Model model,
+      @RequestPart(value = "images") MultipartFile[] multipartFiles) throws ImagesUploadException {
+    try {
+//      log.info("Received the Images from the user, multipartFiles: ");
+      for (MultipartFile multipartFile : multipartFiles) {
+//        log.info("Single multipartFile: " + multipartFile);
+        String imageName = imageURLService.uploadFile(multipartFile);
+//        log.info("Sending to InputQueue, imageName: " + imageName + ", multipartFile.getName(): "
+//            + multipartFile.getName());
+        imageURLService.sendImageToQueue(imageName, multipartFile.getName());
+      }
+    } catch (Exception e) {
+      throw new ImagesUploadException();
+    }
+//    model.addAttribute(multipartFiles);
+    return "showResults";
+  }
+
+  //get method to push results to UI
+  @GetMapping(value = ApiKeys.RESULTS)
+  public String getResults(Model model) {
+	  model.addAttribute("results", s3Service.getResponseResults());
+	  return "resultsFinal";
+  }
+  
+  
+  @GetMapping(value = ApiKeys.LANDING)
+  String index(){
+      return "index";
+  }
+  
+  @GetMapping(value = ApiKeys.INPUT)
+	String uploadForm() {
+		return "imageRecog";
+	}
+}

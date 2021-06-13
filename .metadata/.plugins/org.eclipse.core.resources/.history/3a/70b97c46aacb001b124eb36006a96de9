@@ -1,0 +1,7 @@
+package com.aws.proj1.repo;
+
+public interface Ec2Repo {
+	
+	public void endInstance();
+
+}

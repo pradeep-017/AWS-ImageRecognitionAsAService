@@ -1,0 +1,24 @@
+package com.aws.ccproject;
+
+import com.aws.ccproject.config.AppConfig;
+import com.aws.ccproject.service.ListenerAndDispatchingService;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+@SpringBootApplication
+public class ListenerAppTier {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ListenerAppTier.class, args);
+		System.out.println("Application is running!");
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+		// context.refresh();
+		ListenerAndDispatchingService listenerAndDispatchingService = context
+				.getBean(ListenerAndDispatchingService.class);
+		listenerAndDispatchingService.generalFunction();
+		context.close();
+	}
+}

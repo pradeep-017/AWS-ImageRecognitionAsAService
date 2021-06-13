@@ -1,0 +1,23 @@
+package com.aws.proj1.repo;
+
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.amazonaws.services.s3.model.Bucket;
+
+@Repository
+public interface S3Repo {
+	
+	 void uploadFileToS3Bucket(final String bucketName, final File file);
+    
+	 Bucket createBucket(String bucketName);
+    
+	 Bucket getBucket(String bucketName);
+    
+	 URL getUrl(String bucketName, String key);
+        
+	 List<String> getResponseResults();
+}

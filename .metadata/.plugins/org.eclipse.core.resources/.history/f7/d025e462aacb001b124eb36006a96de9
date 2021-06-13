@@ -1,0 +1,2 @@
+#!/bin/bash
+java -jar /home/ubuntu/proj1-0.0.1-SNAPSHOT.jar

@@ -1,0 +1,13 @@
+package com.aws.ccproject.service;
+
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+
+public interface S3Service {
+		
+	public void uploadFileToS3Bucket(final File file);
+	
+	List<String> getResponseResults();
+
+}

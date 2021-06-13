@@ -1,0 +1,23 @@
+1623552505686	Rename package 'com.aws.proj1.config'
+1623552516615	Rename package 'com.aws.proj1.constants'
+1623552528661	Rename package 'com.aws.proj1.controller'
+1623552540906	Rename package 'com.aws.proj1.exception'
+1623552558284	Rename package 'com.aws.proj1.repo'
+1623552569347	Move compilation units
+1623552575494	Delete element
+1623552871518	Rename package 'com.aws.proj1.service'
+1623553051494	Rename type 'AwsSecretKeys'
+1623553071120	Rename field 'ACCESS_KEY'
+1623553100179	Rename field 'REGION'
+1623553136847	Rename field 'INPUT_QUEUE_NAME'
+1623553154320	Rename field 'OUTPUT_QUEUE'
+1623553634123	Rename field 'SECURITY_GROUP_ID'
+1623554600311	Delete element
+1623554694764	Delete elements
+1623554704123	Delete element
+1623554710602	Delete elements
+1623554723326	Delete elements
+1623554779990	Rename package 'com.aws.proj1'
+1623568972751	Delete elements
+1623578344888	Rename resource 'AutoStartAppTierScript.sh'
+1623620734019	Move 'AutoStartWebTierScript.sh' to 'static'

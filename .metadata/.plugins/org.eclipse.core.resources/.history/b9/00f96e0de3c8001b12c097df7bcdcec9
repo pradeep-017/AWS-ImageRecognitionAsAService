@@ -1,0 +1,29 @@
+package com.aws.proj1.constants;
+
+import com.amazonaws.regions.Regions;
+
+public class AwsSecretKeys {
+
+	public static final String ACCESS_KEY = "";
+
+	public static final String SECRET_KEY = "";
+
+	public static final Regions REGION = Regions.US_EAST_1;
+
+	public static final String INPUT_QUEUE_NAME = "inputMessageQueue";
+
+	public static final String OUTPUT_QUEUE = "outputMessageQueue";
+	
+	public static final String INPUT_S3 = "hemanth546s3input";
+	
+	public static final String OUTPUT_S3 = "hemanth546s3output";
+
+	public static final String SECURITY_GROUP_ID = "sg1";
+
+	public static final Integer MAX_RUNNING_INSTANCES = 19;
+
+	public static final Integer EXISTING_INSTANCES = 1;
+
+	public static final String IMAGE_ID = "ami-0ee8cf7b8a34448a6"; 
+
+}

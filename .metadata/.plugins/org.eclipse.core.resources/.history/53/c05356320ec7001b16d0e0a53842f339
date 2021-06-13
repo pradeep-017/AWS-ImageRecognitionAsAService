@@ -1,0 +1,27 @@
+package com.example.demo.constants;
+
+import com.amazonaws.regions.Regions;
+
+public class Constants {
+
+	public static final String ACCESSKEY = "AKIATQRFWXLXYZPXVQR5";
+
+	public static final String SECRETKEY = "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";
+
+	public static final Regions REGION = Regions.US_EAST_2;
+
+	public static final String FORMAT = "json";
+
+	public static final String INPUTQUEUENAME = "ch-input-queue.fifo";
+
+	public static final String OUTPUTQUEUE = "ch-output-queue.fifo";
+
+	public static final String SECURITYGROUPID = "*****";
+
+	public static final Integer MAXRUNNINGINSTANCES = 20;
+
+	public static final String IMAGEID = "ami-f76d7c97";
+	
+	public static final String BUCKETNAME = "ch-input-bucket";
+
+}

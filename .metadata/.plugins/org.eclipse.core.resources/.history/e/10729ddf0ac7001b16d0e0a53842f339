@@ -1,0 +1,6 @@
+package com.example.demo.service;
+
+public interface LoadBalancerService {
+
+	public void scaleInscaleOut();
+}

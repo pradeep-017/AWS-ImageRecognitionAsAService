@@ -1,0 +1,23 @@
+package com.aws.proj1;
+
+import com.aws.proj1.config.AppConfig;
+import com.aws.proj1.service.LoadBalService;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+@SpringBootApplication
+public class WebTierApplication {
+	//Main Class
+	public static void main(String[] args) {
+		//This function initiate objects for beans
+		SpringApplication.run(WebTierApplication.class, args);
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+		LoadBalService loadBalancerService = context.getBean(LoadBalService.class);
+		//
+		loadBalancerService.scaleOut();
+		context.close();
+	}
+
+}

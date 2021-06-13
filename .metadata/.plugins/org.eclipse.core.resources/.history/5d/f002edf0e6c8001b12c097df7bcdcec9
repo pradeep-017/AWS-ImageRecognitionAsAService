@@ -1,0 +1,7 @@
+package com.aws.proj1.constants;
+
+public class ApiKeys {
+	public static final String HOME="upload";
+	public static final String INPUT="upload";
+	public static final String RESULTS="results";
+}

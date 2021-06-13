@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script>
+
+    $(document).ready(function () {
+        BindControls();
+    });
+
+    function BindControls() {
+
+        var page = 1;           // START WITH FIRST PAGE OF THE GRID, WHEN THE WEB PAGE LOADS FOR THE FIRST TIME.
+        performCrud(page);
+
+        function performCrud(pg) {
+            // CALL WEB API BY MAKING AN AJAX CALL. THE "URL" TAKES A PARAMETER (THE PAGE NUMBER).
+
+            $.ajax({
+                type: "GET",
+                url: "/api/books/" + pg,
+                success: function (data) {
+
+                    var i = 0;          // JUST A COUNTER.
+                    var myBooks = [];
+                    var col = [];
+
+                    $.map(data, function () {
+                        myBooks.push(data[i]);      // GET ALL THE BOOKS (DATA).
+                        i += 1;
+                    });
+
+                    // CREATE A TABLE (WHERE WE'LL THE DATA).
+                    var table = document.createElement('table');
+
+                    // GET VALUES FOR OUR TABLE HEADER. (THE HEADERS ARE THE DATABASE TABLE COLUMNS).
+                    for (var i = 0; i < myBooks.length; i++) {
+                        for (var key in myBooks[i]) {
+                            if (col.indexOf(key) === -1) {
+                                col.push(key);          // ADD THE HEADERS.
+                            }
+                        }
+                    }
+
+                    // TABLE ROW.
+                    var tr = table.insertRow(-1);
+
+                    // CREATE TABLE COLUMN HEADERS.
+                    for (i = 0; i < col.length; i++) {
+                        var th = document.createElement("th");
+                        th.innerHTML = col[i];
+                        tr.appendChild(th);
+                    }
+
+                    // ADD EXTRACTED DATA TO THE TABLE AS ROWS.
+                    for (var i = 0; i < myBooks.length; i++) {
+
+                        tr = table.insertRow(-1);
+
+                        for (var j = 0; j < col.length; j++) {
+                            var tabCell = tr.insertCell(-1);
+                            tabCell.innerHTML = myBooks[i][col[j]];     // GET BOOK DETAILS FOR EACH HEADER.
+                        }
+                    }
+
+                    // ADD THE TABLE WITH A CONTAINER.
+                    var divContainer = document.getElementById('showData');
+                    divContainer.innerHTML = "";
+                    divContainer.appendChild(table);
+
+
+                    // FINALLY CREATE THE PAGERS AT THE BOTTOM OF THE GRID.
+
+                    var divPager = document.createElement('div');
+
+                    for (i = 1; i <= myBooks[0].Total; i++) {
+                        var divPageCount = document.createElement('div');
+                        if (pg == i)        // CHECK IF THE PAGE IS ACTIVE.
+                            divPageCount.innerHTML = '<span class="pageCountInactive">' + i + '</span>';
+                        else
+                            divPageCount.innerHTML = '<span class="pageCountActive" id=' + i + '>' + i + '</span>';
+
+                        divPager.append(divPageCount);
+                    }
+
+                    divContainer.append(divPager);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(textStatus);
+                }
+            });
+        }
+
+        // NOW MAKE THE PAGERS WORK. 
+        // ON EACH ACTIVE PAGER'S CLICK EVENT, 
+        // CALL FUNCTION WITH ITS ID, TO VIEW THE NEXT OR PREVIOUS PAGE.
+        $(document).on('click', '.pageCountActive', function () {
+            performCrud($(this).attr('id'));
+        });
+    }
+</script>
+
+</head>
+<body>
+	<form th:action="@{/results}" th:object="${images}" method="post"
+	enctype="multipart/form-data">
+	<label>Uploaded Images Result Page</label>
+	<br/><br/>
+	<input id="submit" type="submit" tabindex="5" value="Get Results">
+	
+	
+</form>
+</body>
+
+</html>

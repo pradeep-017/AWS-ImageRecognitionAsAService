@@ -1,0 +1,40 @@
+package com.example.demo2.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+
+@Controller
+public class Demo2Controller {
+	@GetMapping("/")
+    String index(){
+        return "index";
+    }
+	
+	@GetMapping("/imageRecog")
+	String imageRecog() {
+		return "imageRecog";
+	}
+	
+	@PostMapping("/imageRecognitionOnCloud")
+	public ResponseEntity<String> uploadFiles(
+		      @RequestPart(value = "images") MultipartFile[] multipartFiles) {
+		    try {
+		      log.info("Received the Images from the user, multipartFiles: ");
+		      for (MultipartFile multipartFile : multipartFiles) {
+		        log.info("Single multipartFile: " + multipartFile);
+		        String imageName = imageURLService.uploadFile(multipartFile);
+		        log.info("Sending to InputQueue, imageName: " + imageName + ", multipartFile.getName(): "
+		            + multipartFile.getName());
+		        imageURLService.sendImageToQueue(imageName, multipartFile.getName());
+		      }
+		    } catch (Exception e) {
+		      return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+		    }
+		    return new ResponseEntity<>("successfully uploaded", HttpStatus.OK);
+		  }
+}

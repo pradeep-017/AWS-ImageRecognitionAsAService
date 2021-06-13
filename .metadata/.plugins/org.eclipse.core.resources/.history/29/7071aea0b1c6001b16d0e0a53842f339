@@ -1,0 +1,22 @@
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.example.config.AppConfig;
+import com.example.service.LoadBalancerService;
+import com.example.service.LoadBalancerServiceImpl;
+
+@SpringBootApplication
+public class DemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Project1Application.class, args);
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+		// context.refresh();
+		LoadBalancerService loadBalancerService = context.getBean(LoadBalancerService.class);
+		loadBalancerService.scaleInscaleOut();
+		context.close();
+	}
+}

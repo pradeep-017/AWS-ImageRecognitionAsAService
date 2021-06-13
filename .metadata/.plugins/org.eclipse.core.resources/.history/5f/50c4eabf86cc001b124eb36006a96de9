@@ -1,0 +1,18 @@
+package com.aws.ccproject.repo;
+
+import com.amazonaws.services.sqs.model.CreateQueueResult;
+import com.amazonaws.services.sqs.model.Message;
+
+public interface SqsRepo {
+
+	CreateQueueResult createQueue(String queueName);
+
+	void deleteMessage(Message message, String queueName);
+
+	Message receiveMessage(String queueName, Integer waitTime, Integer visibilityTimeout);
+
+	void sendMessage(String messageBody, String queueName, Integer delaySeconds);
+	
+	Integer getApproximateNumberOfMsgs(String queueName);
+
+}

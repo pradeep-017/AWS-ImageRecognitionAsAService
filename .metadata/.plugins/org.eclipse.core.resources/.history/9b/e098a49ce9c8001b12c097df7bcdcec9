@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<form th:action="@{/imageRecognitionOnCloud}" th:object="${images}" method="post"
+	enctype="multipart/form-data">
+	<label>Upload Images Form</label>
+	<br/><br/>
+	<input type="file" name="images" multiple="multiple"
+			accept="image/png, image/jpeg" />
+		
+	<br/><br/>
+	<input id="submit" type="submit" tabindex="5" value="Upload">
+</form>
+</html>

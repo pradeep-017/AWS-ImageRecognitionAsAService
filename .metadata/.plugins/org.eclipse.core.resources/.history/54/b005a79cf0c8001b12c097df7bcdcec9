@@ -1,0 +1,5 @@
+package com.aws.proj1.exception;
+
+public class ImagesUploadException {
+
+}
