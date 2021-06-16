@@ -4,11 +4,11 @@ import com.amazonaws.regions.Regions;
 
 public class Constants {
 
-//	public static final String AWS_ACCESS_KEY = "AKIATQRFWXLXYZPXVQR5";
-	public static final String AWS_ACCESS_KEY = "AKIA36HD53CTTGOBBKNW";
+//	public static final String AWS_ACCESS_KEY = "***";
+	public static final String AWS_ACCESS_KEY = "***";
 
-//	public static final String AWS_SECRET_KEY = "lh39tAwXwgtLiOu02HpYF0pBSdX0HLESBRjyy429";
-	public static final String AWS_SECRET_KEY = "QIJXw1ZJXljpBUNZED/PM3KxxcBcXFi411robD4z";
+//	public static final String AWS_SECRET_KEY = "***";
+	public static final String AWS_SECRET_KEY = "****";
 
 	public static final Regions AWS_REGION = Regions.US_EAST_1;
 	
