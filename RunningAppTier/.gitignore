@@ -34,6 +34,7 @@ build/
 
 ### Eclipse - Added by Team ###
 .metadata
+../.metadata
 bin/
 tmp/
 *.tmp

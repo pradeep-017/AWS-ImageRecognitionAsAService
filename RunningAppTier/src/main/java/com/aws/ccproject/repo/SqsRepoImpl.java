@@ -5,9 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +18,8 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
+import com.amazonaws.services.sqs.model.DeleteMessageBatchRequest;
+import com.amazonaws.services.sqs.model.DeleteMessageBatchRequestEntry;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.QueueDoesNotExistException;
@@ -26,6 +31,8 @@ import com.aws.ccproject.constants.Constants;
 
 @Repository
 public class SqsRepoImpl implements SqsRepo {
+	
+	private static Logger logger = LoggerFactory.getLogger(SqsRepoImpl.class);
 
 	@Autowired
 	private AwsConfiguration awsConfiguration;
@@ -98,7 +105,7 @@ public class SqsRepoImpl implements SqsRepo {
 	}
 
 	@Override
-	public Message receiveMessage(String sqsQueue, Integer waitTime, Integer visibilityTimeout) {
+	public List<Message> receiveMessage(String sqsQueue, Integer waitTime, Integer visibilityTimeout) {
 		System.out.println("Receiving the message from the queue...");
 		String queueUrl = awsConfiguration.awsSQS().getQueueUrl(sqsQueue).getQueueUrl();
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
@@ -107,7 +114,7 @@ public class SqsRepoImpl implements SqsRepo {
 		receiveMessageRequest.setMaxNumberOfMessages(1);
 		ReceiveMessageResult receiveMessageResult = awsConfiguration.awsSQS().receiveMessage(receiveMessageRequest);
 		List<Message> messageList = receiveMessageResult.getMessages();
-		return !messageList.isEmpty() ? messageList.get(0) : null;
+		return messageList.isEmpty()? null : messageList;
 	}
 
 	@Override
@@ -124,6 +131,21 @@ public class SqsRepoImpl implements SqsRepo {
 				.withMessageBody(messageBody).withDelaySeconds(delaySeconds);
 		awsConfiguration.awsSQS().sendMessage(sendMessageRequest);
 
+	}
+
+	@Override
+	public void deleteMessageBatch(List<Message> messages, String queueName) {
+		logger.info("Deleting the message batch in the queue...");
+		String queueUrl = awsConfiguration.awsSQS().getQueueUrl(queueName).getQueueUrl();
+		List<DeleteMessageBatchRequestEntry> batchEntries = new ArrayList<>();
+		
+		for(Message msg : messages) {
+			DeleteMessageBatchRequestEntry entry = new DeleteMessageBatchRequestEntry(msg.getMessageId(), msg.getReceiptHandle());
+			batchEntries.add(entry);
+		}
+		DeleteMessageBatchRequest batch = new DeleteMessageBatchRequest(queueUrl, batchEntries);
+		awsConfiguration.awsSQS().deleteMessageBatch(batch);
+		
 	}
 
 }
