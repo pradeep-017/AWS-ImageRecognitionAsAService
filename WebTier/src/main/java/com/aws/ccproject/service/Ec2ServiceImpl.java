@@ -34,8 +34,9 @@ public class Ec2ServiceImpl implements Ec2Service {
 		Integer countOfRunningInstances = 0;
 		for (InstanceStatus instanceStatus : instanceStatusList) {
 			InstanceState instanceState = instanceStatus.getInstanceState();
-			if (instanceState.getName().equals(InstanceStateName.Running.toString()) ||
-					instanceState.getName().equals(InstanceStateName.Pending.toString())) {
+			if (instanceState.getName().equals(InstanceStateName.Running.toString()) 
+					|| instanceState.getName().equals(InstanceStateName.Pending.toString())
+				) {
 				countOfRunningInstances++;
 			}
 		}

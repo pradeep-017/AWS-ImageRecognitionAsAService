@@ -4,28 +4,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.amazonaws.services.ec2.model.AmazonEC2Exception;
 import com.amazonaws.services.ec2.model.DescribeInstanceStatusRequest;
 import com.amazonaws.services.ec2.model.DescribeInstanceStatusResult;
+import com.amazonaws.services.ec2.model.InstanceType;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TagSpecification;
 import com.aws.ccproject.config.AwsConfiguration;
 import com.aws.ccproject.constants.Constants;
+import com.aws.ccproject.controller.WebTierController;
 
 @Repository
 public class Ec2RepoImpl implements Ec2Repo {
+	
+	private static final Logger logger = LoggerFactory.getLogger(Ec2RepoImpl.class);
 
   private static final String NAME = "Name";
-  private static final String APP_INSTANCE = "App-Instance";
+  private static final String APP_INSTANCE = "AppTier-Instance";
   private static final String INSTANCE = "instance";
-  private static final String MIN_AND_MAX_INSTANCE_COUNT = "minInstanceCount: {} , maxInstanceCount:{}";
-  private static final String INSTANCE_TYPE = "t2.micro";
-  private static final String EC2_EXCEPTION = "Exception1: {}";
   private static final String OTHER_EXCEPTION = "Exception2: {}";
   private static final String CREATING_INSTANCE = "Creating the instance.";
 
@@ -49,7 +52,8 @@ public class Ec2RepoImpl implements Ec2Repo {
     if (minInstanceCount == 0) {
       minInstanceCount = 1;
     }
-    securityGroupIds.add(Constants.AWS_SECURITY_GROUP_ID);
+    securityGroupIds.add(Constants.AWS_SECURITY_GROUP_ID1);
+    securityGroupIds.add(Constants.AWS_SECURITY_GROUP_ID2);
     tag.setKey(NAME);
     tag.setValue(APP_INSTANCE);
     tags.add(tag);
@@ -57,20 +61,17 @@ public class Ec2RepoImpl implements Ec2Repo {
     tagSpecification.setTags(tags);
     tagSpecifications.add(tagSpecification);
 
-//    log.info(MIN_AND_MAX_INSTANCE_COUNT, minInstanceCount, maxInstanceCount);
-    
-    System.out.println("minInstanceCount:" + minInstanceCount + ",maxInstanceCount:" + maxInstanceCount );
-    RunInstancesRequest rir = new RunInstancesRequest(imageId, minInstanceCount, maxInstanceCount);
-    rir.setInstanceType(INSTANCE_TYPE);
-    rir.setSecurityGroupIds(securityGroupIds);
-    rir.setTagSpecifications(tagSpecifications);
+    logger.info("minInstanceCount:" + minInstanceCount + ",maxInstanceCount:" + maxInstanceCount );
+    RunInstancesRequest runRequest = new RunInstancesRequest(imageId, minInstanceCount, maxInstanceCount);
+    runRequest.setInstanceType(InstanceType.T2Micro);
+    runRequest.setSecurityGroupIds(securityGroupIds);
+    runRequest.setTagSpecifications(tagSpecifications);
     try {
-      awsConfiguration.awsEC2().runInstances(rir);
+      awsConfiguration.awsEC2().runInstances(runRequest);
     } catch (AmazonEC2Exception amzEc2Exp) {
-    	System.out.println("Creation of EC2 instance failed: " + amzEc2Exp.getErrorMessage());
-//      log.info(EC2_EXCEPTION, amzEc2Exp.getErrorMessage());
+    	logger.info("Creation of EC2 instance failed: " + amzEc2Exp.getErrorMessage());
     } catch (Exception e) {
-//      log.info(OTHER_EXCEPTION, e.getMessage());
+    	logger.info(OTHER_EXCEPTION, e.getMessage());
     }
     return nameCount;
   }

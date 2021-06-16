@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.DeleteMessageBatchRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageBatchRequestEntry;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.GetQueueAttributesRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.QueueDoesNotExistException;
@@ -23,13 +22,15 @@ import com.aws.ccproject.config.AwsConfiguration;
 
 @Repository
 public class SqsRepoImpl implements SqsRepo {
+	
+	private static final Logger logger = LoggerFactory.getLogger(SqsRepoImpl.class);
 
 	@Autowired
 	private AwsConfiguration awsConfiguration;
 
 	@Override
 	public void deleteMessage(List<Message> messages, String queueName) {
-//		log.info("Deleting message from the queue.");
+		logger.info("Deleting message batch from the queue.");
 		String queueUrl = awsConfiguration.awsSQS().getQueueUrl(queueName).getQueueUrl();
 //		String messageReceiptHandle = message.getReceiptHandle();
 //		DeleteMessageRequest deleteMessageRequest = new DeleteMessageRequest(queueUrl, messageReceiptHandle);
@@ -38,7 +39,6 @@ public class SqsRepoImpl implements SqsRepo {
 		for(Message msg : messages) {
 			DeleteMessageBatchRequestEntry entry = new DeleteMessageBatchRequestEntry(msg.getMessageId(), msg.getReceiptHandle());
 			batchEntries.add(entry);
-			
 		}
 		DeleteMessageBatchRequest batch = new DeleteMessageBatchRequest(queueUrl, batchEntries);
 		awsConfiguration.awsSQS().deleteMessageBatch(batch);
@@ -46,14 +46,14 @@ public class SqsRepoImpl implements SqsRepo {
 
 	@Override
 	public CreateQueueResult createQueue(String queueName) {
-//		log.info("Creating the queue.");
+		logger.info("Creating the queue.");
 		CreateQueueResult createQueueResult = awsConfiguration.awsSQS().createQueue(queueName);
 		return createQueueResult;
 	}
 
 	@Override
 	public List<Message> receiveMessage(String queueName, Integer waitTime, Integer visibilityTimeout) {
-//		log.info("Receiving the message from the queue.");
+		logger.info("Receiving the message batch from the queue.");
 		String queueUrl = null;
 		try {
 			queueUrl = awsConfiguration.awsSQS().getQueueUrl(queueName).getQueueUrl();
@@ -73,13 +73,13 @@ public class SqsRepoImpl implements SqsRepo {
 
 	@Override
 	public void sendMessage(String messageBody, String queueName, Integer delaySeconds) {
-//		log.info("Sending the message into the queue:" + messageBody);
+		logger.info("Sending the message into the queue:" + messageBody);
 		//Sending the message into the queue:https://hemanth546s3input.s3.amazonaws.com/test_0.JPEG-images
 		String queueUrl = null;
 		try {
 			queueUrl = awsConfiguration.awsSQS().getQueueUrl(queueName).getQueueUrl();
 		} catch (QueueDoesNotExistException queueDoesNotExistException) {
-//			log.info("SQS queue is not present in list and is creating now with name: " + queueName);
+			logger.info("SQS queue is not present in list and is creating now with name: " + queueName);
 			CreateQueueResult createQueueResult = this.createQueue(queueName);
 			queueUrl = awsConfiguration.awsSQS().getQueueUrl(queueName).getQueueUrl();
 		}
@@ -91,7 +91,7 @@ public class SqsRepoImpl implements SqsRepo {
 
 	@Override
 	public Integer getApproximateNumberOfMsgs(String queueName) {
-//		log.info("Getting approximate number of messages.");
+		logger.info("Getting approximate number of messages.");
 		String queueUrl = null;
 		try {
 			queueUrl = awsConfiguration.awsSQS().getQueueUrl(queueName).getQueueUrl();
@@ -103,7 +103,7 @@ public class SqsRepoImpl implements SqsRepo {
 		List<String> attributeNames = new ArrayList<String>();
 		attributeNames.add("ApproximateNumberOfMessages");
 		GetQueueAttributesRequest getQueueAttributesRequest = new GetQueueAttributesRequest(queueUrl, attributeNames);
-		Map map = awsConfiguration.awsSQS().getQueueAttributes(getQueueAttributesRequest).getAttributes();
+		Map<String, String> map = awsConfiguration.awsSQS().getQueueAttributes(getQueueAttributesRequest).getAttributes();
 		String numberOfMessagesString = (String) map.get("ApproximateNumberOfMessages");
 		Integer numberOfMessages = Integer.valueOf(numberOfMessagesString);
 		return numberOfMessages;
