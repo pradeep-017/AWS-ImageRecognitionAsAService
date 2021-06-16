@@ -2,6 +2,8 @@ package com.aws.ccproject.service;
 
 import com.aws.ccproject.repo.SqsRepo;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +17,8 @@ public class SqsServiceImpl implements SqsService {
 	private SqsRepo sqsRepo;
 	
 	@Override
-	public void deleteMessage(Message message, String queueName) {
-		sqsRepo.deleteMessage(message, queueName);
+	public void deleteMessageBatch(List<Message> messages, String queueName) {
+		sqsRepo.deleteMessageBatch(messages, queueName);
 	}
 	
 	@Override
@@ -34,7 +36,7 @@ public class SqsServiceImpl implements SqsService {
 	}
 	
 	@Override
-	public Message receiveMessage(String queueName, Integer waitTime, Integer visibilityTimeout) {
+	public List<Message> receiveMessage(String queueName, Integer waitTime, Integer visibilityTimeout) {
 		return sqsRepo.receiveMessage(queueName, waitTime, visibilityTimeout);
 	}
 

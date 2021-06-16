@@ -5,9 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +18,8 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
+import com.amazonaws.services.sqs.model.DeleteMessageBatchRequest;
+import com.amazonaws.services.sqs.model.DeleteMessageBatchRequestEntry;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.QueueDoesNotExistException;
@@ -26,43 +31,59 @@ import com.aws.ccproject.constants.Constants;
 
 @Repository
 public class SqsRepoImpl implements SqsRepo {
+	
+	private static Logger logger = LoggerFactory.getLogger(SqsRepoImpl.class);
 
 	@Autowired
 	private AwsConfiguration awsConfiguration;
 
+//	@Override
+//	public void deleteMessage(Message message, String queueName) {
+//		logger.info("Deleting the message in the queue...");
+//		String queueUrl = awsConfiguration.awsSQS().getQueueUrl(queueName).getQueueUrl();
+//		String messageReceiptHandle = message.getReceiptHandle();
+//		DeleteMessageRequest deleteMessageRequest = new DeleteMessageRequest(queueUrl, messageReceiptHandle);
+//		awsConfiguration.awsSQS().deleteMessage(deleteMessageRequest);
+//	}
+	
 	@Override
-	public void deleteMessage(Message message, String queueName) {
-		System.out.println("Deleting the message in the queue...");
+	public void deleteMessageBatch(List<Message> messages, String queueName) {
+		logger.info("Deleting the message batch in the queue...");
 		String queueUrl = awsConfiguration.awsSQS().getQueueUrl(queueName).getQueueUrl();
-		String messageReceiptHandle = message.getReceiptHandle();
-		DeleteMessageRequest deleteMessageRequest = new DeleteMessageRequest(queueUrl, messageReceiptHandle);
-		awsConfiguration.awsSQS().deleteMessage(deleteMessageRequest);
+		List<DeleteMessageBatchRequestEntry> batchEntries = new ArrayList<>();
+		
+		for(Message msg : messages) {
+			DeleteMessageBatchRequestEntry entry = new DeleteMessageBatchRequestEntry(msg.getMessageId(), msg.getReceiptHandle());
+			batchEntries.add(entry);
+		}
+		DeleteMessageBatchRequest batch = new DeleteMessageBatchRequest(queueUrl, batchEntries);
+		awsConfiguration.awsSQS().deleteMessageBatch(batch);
 	}
 
 	@Override
 	public CreateQueueResult createQueue(String queueName) {
-		System.out.println("Creating the queue...");
+		logger.info("Creating the queue...");
 		CreateQueueResult createQueueResult = awsConfiguration.awsSQS().createQueue(queueName);
 		return createQueueResult;
 	}
 
 	public String imageRecognitionProcess(String imageName) {
-		System.out.println("Running the deep learning model...");
+		logger.info("Running the deep learning model...");
 		String s3ImageUrl = "s3://" + Constants.INPUT_S3 + "/" + imageName;
-		System.out.println("s3ImageUrl: " + s3ImageUrl);
+		logger.info("s3ImageUrl: " + s3ImageUrl);
 
 		GetObjectRequest request = new GetObjectRequest(Constants.INPUT_S3, imageName);
 		S3Object object = awsConfiguration.awsS3().getObject(request);
 		S3ObjectInputStream objectContent = object.getObjectContent();
-		System.out.println("s3ImageUrl: " + s3ImageUrl);
+		logger.info("s3ImageUrl: " + s3ImageUrl);
 		try {
-			System.out.println("Downloading to location: ");
+			logger.info("Downloading to location: ");
 			IOUtils.copy(objectContent, new FileOutputStream("/home/ubuntu/classifier/" + imageName));
 		} catch (FileNotFoundException e) {
-			System.out.println("FileNotFoundException");
+			logger.info("FileNotFoundException");
 			e.printStackTrace();
 		} catch (IOException e) {
-			System.out.println("IOException");
+			logger.info("IOException");
 			e.printStackTrace();
 		}
 
@@ -74,22 +95,22 @@ public class SqsRepoImpl implements SqsRepo {
 
 			p.waitFor();
 			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//			System.out.println("ProcessBuilder: " + p);
+//			logger.info("ProcessBuilder: " + p);
 			BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			System.out.println("br: " + br);
-			System.out.println("strError: " + stdError);
+			logger.info("br: " + br);
+			logger.info("strError: " + stdError);
 			output = br.readLine();
-			System.out.println("termOutput: " + output);
+			logger.info("termOutput: " + output);
 			p.destroy();
 		} catch (Exception e) {
-			System.out.println("Error while processing image recognition");
+			logger.info("Error while processing image recognition");
 			e.printStackTrace();
 		}
 		return output.trim();
 	}
 
 	public String parseURL(String urlInput) {
-		System.out.println("Parsing the deep learning output.");
+		logger.info("Parsing the deep learning output.");
 		String nameImage = null;
 		String[] tokens = urlInput.split("/");
 		for (String temp : tokens)
@@ -98,8 +119,8 @@ public class SqsRepoImpl implements SqsRepo {
 	}
 
 	@Override
-	public Message receiveMessage(String sqsQueue, Integer waitTime, Integer visibilityTimeout) {
-		System.out.println("Receiving the message from the queue...");
+	public List<Message> receiveMessage(String sqsQueue, Integer waitTime, Integer visibilityTimeout) {
+		logger.info("Receiving the message from the queue...");
 		String queueUrl = awsConfiguration.awsSQS().getQueueUrl(sqsQueue).getQueueUrl();
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
 		receiveMessageRequest.setWaitTimeSeconds(waitTime);
@@ -107,12 +128,12 @@ public class SqsRepoImpl implements SqsRepo {
 		receiveMessageRequest.setMaxNumberOfMessages(1);
 		ReceiveMessageResult receiveMessageResult = awsConfiguration.awsSQS().receiveMessage(receiveMessageRequest);
 		List<Message> messageList = receiveMessageResult.getMessages();
-		return !messageList.isEmpty() ? messageList.get(0) : null;
+		return messageList.isEmpty()? null : messageList;
 	}
 
 	@Override
 	public void sendMessage(String messageBody, String queueName, Integer delaySeconds) {
-		System.out.println("Sending the message into the queue...");
+		logger.info("Sending the message into the queue...");
 		String queueUrl = null;
 		try {
 			queueUrl = awsConfiguration.awsSQS().getQueueUrl(queueName).getQueueUrl();

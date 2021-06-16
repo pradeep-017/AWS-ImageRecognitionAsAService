@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Repository
 public class S3RepoImpl implements S3Repo {
-
+	
+	private static Logger logger = LoggerFactory.getLogger(S3RepoImpl.class);
+	
 	@Autowired
 	private AwsConfiguration awsConfiguration;
 
@@ -27,10 +31,10 @@ public class S3RepoImpl implements S3Repo {
 	public Bucket createBucket() {
 		Bucket s3Bucket = null;
 		if (awsConfiguration.awsS3().doesBucketExistV2(Constants.OUTPUT_S3)) {
-			System.out.println(Constants.GET_BUCKET + Constants.OUTPUT_S3);
+			logger.info(Constants.GET_BUCKET + Constants.OUTPUT_S3);
 			s3Bucket = getBucket();
 		} else {
-			System.out.println(Constants.CREATE_BUCKET + Constants.OUTPUT_S3);
+			logger.info(Constants.CREATE_BUCKET + Constants.OUTPUT_S3);
 			s3Bucket = awsConfiguration.awsS3().createBucket(Constants.OUTPUT_S3);
 		}
 
@@ -51,7 +55,7 @@ public class S3RepoImpl implements S3Repo {
 
 	@Override
 	public void putObject(String key, String value) {
-		System.out.println(Constants.INSERTING_INTO_BUCKET);
+		logger.info(Constants.INSERTING_INTO_BUCKET);
 		this.createBucket();
 		@SuppressWarnings("serial")
 		Map<String, String> predictionMap = new HashMap<String, String>() {
@@ -61,7 +65,7 @@ public class S3RepoImpl implements S3Repo {
 		};
 		try {
 			String prediction = new ObjectMapper().writeValueAsString(predictionMap);
-			System.out.println("Saving output prediction for image: " + key);
+			logger.info("Saving output prediction for image: " + key);
 			ObjectMetadata meta = new ObjectMetadata();
 			meta.setContentLength(prediction.length());
 			InputStream stream = new ByteArrayInputStream(prediction.getBytes(StandardCharsets.UTF_8));
@@ -70,7 +74,7 @@ public class S3RepoImpl implements S3Repo {
 			awsConfiguration.awsS3().putObject(putObjectRequest);
 
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 	}
 
