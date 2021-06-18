@@ -25,3 +25,9 @@ When there is no message in the Input queue, the application shuts down the inst
 ## Instructions:-
 Webtier is running in AWS. HTTP Requests should be sent to this link:  
 http://ec2-35-170-71-37.compute-1.amazonaws.com:8080/upload 
+
+## Team Members
+Pradeep Kumar Chenchala (1221706239)  
+Sai Priyanka Gollu (1219950251)  
+Lakshmi Manasa Lingamaneni (1220558469)  
+
