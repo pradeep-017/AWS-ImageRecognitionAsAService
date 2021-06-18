@@ -22,9 +22,12 @@ This application runs inside the app instances and listens for messages (request
 When the message arrives, it takes the message, stores a local copy for the image and runs the deep learning model for classification, puts the classification result into a **S3 output bucket “cc21cprk-output-bucket”**. The classification result is also inserted into the Output Queue “cc21cprk-output-queue”.
 When there is no message in the Input queue, the application shuts down the instance in which its running, facilitating scale in.
 
-## Instructions:-
-Webtier is running in AWS. HTTP Requests should be sent to this link:  
+## Instructions:
+AWS Credentials are already in place in Constants.java file in both AppTier and WebTier. Webtier is running in AWS. HTTP Requests should be sent to this link:  
 http://ec2-35-170-71-37.compute-1.amazonaws.com:8080/upload 
+
+Example test run command:  
+python3 multithread_workload_generator.py --num_request 100 --url 'http://ec2-35-170-71-37.compute-1.amazonaws.com:8080/upload' --image_folder /Users/pradeep/Downloads/imagenet-100/
 
 ## Team Members
 Pradeep Kumar Chenchala (1221706239)  
