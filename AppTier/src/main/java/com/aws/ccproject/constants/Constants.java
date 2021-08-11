@@ -5,10 +5,8 @@ import com.amazonaws.regions.Regions;
 public class Constants {
 
 //	public static final String AWS_ACCESS_KEY = "****";
-	public static final String AWS_ACCESS_KEY = "AKIAQJHC3S3ECRW3ZWI6";
 
 //	public static final String AWS_SECRET_KEY = "****";
-	public static final String AWS_SECRET_KEY = "dfHXG+LJkJhYZe8n1JBji4+HoVpu1DnxLj+C+Zfs";
 
 	public static final Regions AWS_REGION = Regions.US_EAST_1;
 	
